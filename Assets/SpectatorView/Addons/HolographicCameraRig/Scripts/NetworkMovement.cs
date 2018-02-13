@@ -20,7 +20,7 @@ namespace SpectatorView
 
         #region Private Fields
 
-        // is component attached to cam
+        // компонент присоединён к камере?
         private bool attachToCam = false;
 
         private const int maxNetworkTransforms = 3;
@@ -33,7 +33,7 @@ namespace SpectatorView
 
         private void Start()
         {
-            // if gameobject contains SV_Camera component
+            // объект содержит компонент SV_Camera?
             if (GetComponent<SV_Camera>() != null)
             {
                 attachToCam = true;
@@ -46,13 +46,15 @@ namespace SpectatorView
             {
                 NetworkTransform networkTransform = networkTransforms.Dequeue();
 
-                gameObject.transform.localPosition = networkTransform.Position;
-                gameObject.transform.localRotation = networkTransform.Rotation;
-
-                // if this component attached to SV_Camera gameobject
-                if (attachToCam)
+                // компонент прикреплён к камере и синхронизация SV_Camera включена
+                if (attachToCam
+                    && SV_RemoteControl.Instance.SV_CameraSync)
                 {
-                    // provide SV_camera offset
+                    // синхронизирует позицию головы и объекта
+                    gameObject.transform.localPosition = networkTransform.Position;
+                    gameObject.transform.localRotation = networkTransform.Rotation;
+
+                    // добавляет оффсет позиции объекта
                     gameObject.transform.position = gameObject.transform.position
                         - SV_RemoteControl.Instance.SV_Camera_Position;
                 }

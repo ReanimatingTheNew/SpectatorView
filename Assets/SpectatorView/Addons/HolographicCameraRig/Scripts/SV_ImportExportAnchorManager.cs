@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using HoloToolkit.Sharing;
-using HoloToolkit.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace SpectatorView
     /// <summary>
     /// Manages creating anchors and sharing the anchors with other clients.
     /// </summary>
-    public class SV_ImportExportAnchorManager : SpectatorView.SV_Singleton<SV_ImportExportAnchorManager>
+    public class SV_ImportExportAnchorManager : SV_Singleton<SV_ImportExportAnchorManager>
     {
         /// <summary>
         /// Enum to track the progress through establishing a shared coordinate system.
@@ -120,7 +119,7 @@ namespace SpectatorView
 
         void Start()
         {
-            Debug.Log("Import Export Manager starting");
+            //Debug.Log("Import Export Manager starting");
 
             currentState = ImportExportState.Ready;
 
@@ -252,7 +251,7 @@ namespace SpectatorView
 
         bool LocalUserHasLowestUserId()
         {
-            long localUserId = SpectatorView.SV_CustomMessages.Instance.localUserID;
+            long localUserId = SV_CustomMessages.Instance.localUserID;
             foreach (User user in SharingStage.Instance.SessionUsersTracker.CurrentUsers)
             {
                 long userid = (long)user.GetID();

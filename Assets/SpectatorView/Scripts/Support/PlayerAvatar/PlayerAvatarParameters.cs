@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class PlayerAvatarParameters : MonoBehaviour
+namespace SpectatorView
 {
-    public AudioClip PlayerJoinedClip;
+    public class PlayerAvatarParameters : MonoBehaviour
+    {
+        public AudioClip PlayerJoinedClip;
 
-    public AudioClip PlayerHitSomeoneClip;
-    public AudioClip SomeoneHitPlayerClip;
+        public AudioClip PlayerHitSomeoneClip;
+        public AudioClip SomeoneHitPlayerClip;
 
-    public GameObject PlayerShotObject;
+        public GameObject PlayerShotObject;
+    }
 }

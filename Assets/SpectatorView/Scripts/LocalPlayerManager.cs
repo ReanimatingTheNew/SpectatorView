@@ -1,37 +1,40 @@
 ﻿using UnityEngine;
-using SpectatorView;
+using SpectatorView.Sharing;
 
-/// <summary>
-/// Transmits the current position of the user's head to the others of the users in Update function
-/// </summary>
-public class LocalPlayerManager : SV_Singleton<LocalPlayerManager>
+namespace SpectatorView
 {
-    #region Main Methods
-
-    // Send the user's head position each frame.
-    void Update()
+    /// <summary>
+    /// Transmits the current position of the user's head to the others of the users in Update function
+    /// </summary>
+    public class LocalPlayerManager : SV_Singleton<LocalPlayerManager>
     {
-        // if model placed
-        if (SV_ImportExportAnchorManager.Instance
-            && SV_ImportExportAnchorManager.Instance.AnchorEstablished)
+        #region Main Methods
+
+        // Send the user's head position each frame.
+        void Update()
         {
-            // Grab the current head transform and broadcast it to all the other users in the session
-            Transform headTransform = Camera.main.transform;
-
-            // Transform the head position and rotation into local space
-            Vector3 headPosition = transform.InverseTransformPoint(headTransform.position);
-            Quaternion headRotation = Quaternion.Inverse(transform.rotation) * headTransform.rotation;
-
-            if (SV_Sharing.Instance)
+            // if model placed
+            if (SV_ImportExportAnchorManager.Instance
+                && SV_ImportExportAnchorManager.Instance.AnchorEstablished)
             {
-                // send head transform
-                SV_Sharing.Instance.SendHeadTransform(headPosition,
-                    headRotation,
-                    headTransform.localScale,
-                    0x1);
+                // Grab the current head transform and broadcast it to all the other users in the session
+                Transform headTransform = Camera.main.transform;
+
+                // Transform the head position and rotation into local space
+                Vector3 headPosition = transform.InverseTransformPoint(headTransform.position);
+                Quaternion headRotation = Quaternion.Inverse(transform.rotation) * headTransform.rotation;
+
+                if (SV_Sharing.Instance)
+                {
+                    // send head transform
+                    SV_Sharing.Instance.SendHeadTransform(headPosition,
+                        headRotation,
+                        headTransform.localScale,
+                        0x1);
+                }
             }
         }
-    }
 
-    #endregion
+        #endregion
+    }
 }

@@ -1,4 +1,0 @@
-C:\Users\HoloGroup\Desktop\SpectatorView\SpectatorView 5.6\App\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj;x86
-C:\Users\HoloGroup\Desktop\SpectatorView\SpectatorView 5.6\App\GeneratedProjects\UWP\Assembly-CSharp-firstpass\Assembly-CSharp-firstpass.csproj;x86
-C:\Users\HoloGroup\Desktop\SpectatorView\SpectatorView 5.6\App\GeneratedProjects\UWP\Assembly-CSharp-firstpass\Assembly-CSharp-firstpass.csproj;x86
-C:\Users\HoloGroup\Desktop\SpectatorView\SpectatorView 5.6\App\Spectator View\Spectator View.csproj;x86

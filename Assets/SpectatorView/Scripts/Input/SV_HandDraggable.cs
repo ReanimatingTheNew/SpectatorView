@@ -2,6 +2,8 @@
 using UnityEngine;
 using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
+using SpectatorView.Sharing;
+using Andy.IdGenerator;
 
 namespace SpectatorView.InputModule
 {
@@ -18,21 +20,31 @@ namespace SpectatorView.InputModule
 
         public bool IsEnabled = true;
 
-        public string SV_SharingTag = "";
-
         public bool ShareTransform = true;
 
         [Tooltip("Transform that will be dragged. Defaults to the object of the component.")]
         public Transform HostTransform;
 
-        [Tooltip("Scale by which hand movement in z is multipled to move the dragged object.")]
+        [Tooltip("Scale by which hand movement in z is multiplied to move the dragged object.")]
         public float DistanceScale = 2f;
 
-        [Tooltip("Should the object be kept upright as it is being dragged?")]
-        public bool IsKeepUpright = false;
+        public enum RotationModeEnum
+        {
+            Default,
+            LockObjectRotation,
+            OrientTowardUser,
+            OrientTowardUserAndKeepUpright
+        }
 
-        [Tooltip("Should the object be oriented towards the user as it is being dragged?")]
-        public bool IsOrientTowardsUser = true;
+        public RotationModeEnum RotationMode = RotationModeEnum.Default;
+
+        [Tooltip("Controls the speed at which the object will interpolate toward the desired position")]
+        [Range(0.01f, 1.0f)]
+        public float PositionLerpSpeed = 0.2f;
+
+        [Tooltip("Controls the speed at which the object will interpolate toward the desired rotation")]
+        [Range(0.01f, 1.0f)]
+        public float RotationLerpSpeed = 0.2f;
 
         #endregion
 
@@ -44,6 +56,7 @@ namespace SpectatorView.InputModule
         private bool isGazed;
 
         private Vector3 objRefForward;
+        private Vector3 objRefUp;
 
         private float objRefDistance;
 
@@ -57,9 +70,12 @@ namespace SpectatorView.InputModule
 
         private Quaternion draggingRotation;
 
-        private IInputSource currentInputSource = null;
+        private IInputSource currentInputSource;
 
         private uint currentInputSourceId;
+
+        private int _objectId;
+        private IDHolder _idHolder;
 
         #endregion
 
@@ -87,6 +103,13 @@ namespace SpectatorView.InputModule
             }
 
             mainCamera = Camera.main;
+
+            _idHolder = HostTransform.GetComponent<IDHolder>();
+
+            if (_idHolder != null)
+            {
+                _objectId = _idHolder.ID;
+            }
         }
 
         private void Update()
@@ -99,35 +122,7 @@ namespace SpectatorView.InputModule
 
         #endregion
 
-        #region Events
-
-        public void OnInputUp(InputEventData eventData)
-        {
-            if (currentInputSource != null &&
-                eventData.SourceId == currentInputSourceId)
-            {
-                StopDragging();
-            }
-        }
-
-        public void OnInputDown(InputEventData eventData)
-        {
-            if (isDragging)
-            {
-                // We're already handling drag input, so we can't start a new drag operation.
-                return;
-            }
-
-            if (!eventData.InputSource.SupportsInputInfo(eventData.SourceId, SupportedInputInfo.Position))
-            {
-                // The input source must provide positional data for this script to be usable
-                return;
-            }
-
-            currentInputSource = eventData.InputSource;
-            currentInputSourceId = eventData.SourceId;
-            StartDragging();
-        }
+        #region Event Methods
 
         public void OnFocusEnter()
         {
@@ -159,7 +154,38 @@ namespace SpectatorView.InputModule
             isGazed = false;
         }
 
-        public void OnSourceDetected(SourceStateEventData eventData) { }
+        public void OnInputUp(InputEventData eventData)
+        {
+            if (currentInputSource != null &&
+                eventData.SourceId == currentInputSourceId)
+            {
+                StopDragging();
+            }
+        }
+
+        public void OnInputDown(InputEventData eventData)
+        {
+            if (isDragging)
+            {
+                // We're already handling drag input, so we can't start a new drag operation.
+                return;
+            }
+
+            if (!eventData.InputSource.SupportsInputInfo(eventData.SourceId, SupportedInputInfo.Position))
+            {
+                // The input source must provide positional data for this script to be usable
+                return;
+            }
+
+            currentInputSource = eventData.InputSource;
+            currentInputSourceId = eventData.SourceId;
+            StartDragging();
+        }
+
+        public void OnSourceDetected(SourceStateEventData eventData)
+        {
+            // Nothing to do
+        }
 
         public void OnSourceLost(SourceStateEventData eventData)
         {
@@ -169,52 +195,22 @@ namespace SpectatorView.InputModule
             }
         }
 
-        /// <summary>
-        /// Update the position of the object being dragged.
-        /// </summary>
-        private void UpdateDragging()
+        private void OnDestroy()
         {
-            Vector3 newHandPosition;
-            currentInputSource.TryGetPosition(currentInputSourceId, out newHandPosition);
-
-            Vector3 pivotPosition = GetHandPivotPosition();
-
-            Vector3 newHandDirection = Vector3.Normalize(newHandPosition - pivotPosition);
-
-            newHandDirection = mainCamera.transform.InverseTransformDirection(newHandDirection); // in camera space
-            Vector3 targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
-            targetDirection = mainCamera.transform.TransformDirection(targetDirection); // back to world space
-
-            float currenthandDistance = Vector3.Magnitude(newHandPosition - pivotPosition);
-
-            float distanceRatio = currenthandDistance / handRefDistance;
-            float distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * DistanceScale : 0;
-            float targetDistance = objRefDistance + distanceOffset;
-
-            draggingPosition = pivotPosition + (targetDirection * targetDistance);
-
-            if (IsOrientTowardsUser)
+            if (isDragging)
             {
-                draggingRotation = Quaternion.LookRotation(HostTransform.position - pivotPosition);
-            }
-            else
-            {
-                Vector3 objForward = mainCamera.transform.TransformDirection(objRefForward); // in world space
-                draggingRotation = Quaternion.LookRotation(objForward);
+                StopDragging();
             }
 
-            // Apply Final Position
-            HostTransform.position = draggingPosition + mainCamera.transform.TransformDirection(objRefGrabPoint);
-            HostTransform.rotation = draggingRotation;
-
-            if (IsKeepUpright)
+            if (isGazed)
             {
-                Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
-                HostTransform.rotation = upRotation * HostTransform.rotation;
+                OnFocusExit();
             }
-
-            SV_ShareTransform();
         }
+
+        #endregion
+
+        #region Utility Methods
 
         /// <summary>
         /// Starts dragging the object.
@@ -245,6 +241,7 @@ namespace SpectatorView.InputModule
             objRefDistance = Vector3.Magnitude(gazeHitPosition - pivotPosition);
 
             Vector3 objForward = HostTransform.forward;
+            Vector3 objUp = HostTransform.up;
 
             // Store where the object was grabbed from
             objRefGrabPoint = mainCamera.transform.InverseTransformDirection(HostTransform.position - gazeHitPosition);
@@ -253,16 +250,100 @@ namespace SpectatorView.InputModule
             Vector3 handDirection = Vector3.Normalize(handPosition - pivotPosition);
 
             objForward = mainCamera.transform.InverseTransformDirection(objForward);       // in camera space
+            objUp = mainCamera.transform.InverseTransformDirection(objUp);                 // in camera space
             objDirection = mainCamera.transform.InverseTransformDirection(objDirection);   // in camera space
             handDirection = mainCamera.transform.InverseTransformDirection(handDirection); // in camera space
 
             objRefForward = objForward;
+            objRefUp = objUp;
 
             // Store the initial offset between the hand and the object, so that we can consider it when dragging
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = gazeHitPosition;
 
             StartedDragging.RaiseEvent();
+        }
+
+        /// <summary>
+        /// Gets the pivot position for the hand, which is approximated to the base of the neck.
+        /// </summary>
+        /// <returns>Pivot position for the hand.</returns>
+        private Vector3 GetHandPivotPosition()
+        {
+            Vector3 pivot = Camera.main.transform.position + new Vector3(0, -0.2f, 0) - Camera.main.transform.forward * 0.2f; // a bit lower and behind
+            return pivot;
+        }
+
+        /// <summary>
+        /// Enables or disables dragging.
+        /// </summary>
+        /// <param name="isEnabled">Indicates whether dragging should be enabled or disabled.</param>
+        public void SetDragging(bool isEnabled)
+        {
+            if (IsEnabled == isEnabled)
+            {
+                return;
+            }
+
+            IsEnabled = isEnabled;
+
+            if (isDragging)
+            {
+                StopDragging();
+            }
+        }
+
+        /// <summary>
+        /// Update the position of the object being dragged.
+        /// </summary>
+        private void UpdateDragging()
+        {
+            Vector3 newHandPosition;
+            currentInputSource.TryGetPosition(currentInputSourceId, out newHandPosition);
+
+            Vector3 pivotPosition = GetHandPivotPosition();
+
+            Vector3 newHandDirection = Vector3.Normalize(newHandPosition - pivotPosition);
+
+            newHandDirection = mainCamera.transform.InverseTransformDirection(newHandDirection); // in camera space
+            Vector3 targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
+            targetDirection = mainCamera.transform.TransformDirection(targetDirection); // back to world space
+
+            float currentHandDistance = Vector3.Magnitude(newHandPosition - pivotPosition);
+
+            float distanceRatio = currentHandDistance / handRefDistance;
+            float distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * DistanceScale : 0;
+            float targetDistance = objRefDistance + distanceOffset;
+
+            draggingPosition = pivotPosition + (targetDirection * targetDistance);
+
+            if (RotationMode == RotationModeEnum.OrientTowardUser || RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)
+            {
+                draggingRotation = Quaternion.LookRotation(HostTransform.position - pivotPosition);
+            }
+            else if (RotationMode == RotationModeEnum.LockObjectRotation)
+            {
+                draggingRotation = HostTransform.rotation;
+            }
+            else // RotationModeEnum.Default
+            {
+                Vector3 objForward = mainCamera.transform.TransformDirection(objRefForward); // in world space
+                Vector3 objUp = mainCamera.transform.TransformDirection(objRefUp);   // in world space
+                draggingRotation = Quaternion.LookRotation(objForward, objUp);
+            }
+
+            // Apply Final Position
+            HostTransform.position = Vector3.Lerp(HostTransform.position, draggingPosition + mainCamera.transform.TransformDirection(objRefGrabPoint), PositionLerpSpeed);
+            // Apply Final Rotation
+            HostTransform.rotation = Quaternion.Lerp(HostTransform.rotation, draggingRotation, RotationLerpSpeed);
+
+            if (RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)
+            {
+                Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
+                HostTransform.rotation = upRotation * HostTransform.rotation;
+            }
+
+            SV_ShareTransform();
         }
 
         /// <summary>
@@ -285,61 +366,17 @@ namespace SpectatorView.InputModule
             SV_ShareTransform();
         }
 
-        private void OnDestroy()
-        {
-            if (isDragging)
-            {
-                StopDragging();
-            }
-
-            if (isGazed)
-            {
-                OnFocusExit();
-            }
-        }
-
-        #endregion
-
-        #region Utility Methods
-
-        /// <summary>
-        /// Gets the pivot position for the hand, which is approximated to the base of the neck.
-        /// </summary>
-        /// <returns>Pivot position for the hand.</returns>
-        private Vector3 GetHandPivotPosition()
-        {
-            Vector3 pivot = Camera.main.transform.position + new Vector3(0, -0.2f, 0) 
-                - Camera.main.transform.forward * 0.2f; // a bit lower and behind
-            return pivot;
-        }
-
-        /// <summary>
-        /// Enables or disables dragging.
-        /// </summary>
-        /// <param name="active">Indicates whether dragging shoudl be enabled or disabled.</param>
-        public void SetDragging(bool active)
-        {
-            if (IsEnabled == active)
-            {
-                return;
-            }
-
-            IsEnabled = active;
-
-            if (isDragging)
-            {
-                StopDragging();
-            }
-        }
-
         public void SV_ShareTransform()
         {
             if (ShareTransform)
             {
-                SV_Sharing.Instance.SendTransform(HostTransform.localPosition,
-                                                  HostTransform.localRotation,
-                                                  HostTransform.localScale,
-                                                  SV_SharingTag);
+                SV_Sharing.Instance.SendJson(new SV_TransformSync.TransformData(_objectId,
+                                            HostTransform.position,
+                                            HostTransform.rotation,
+                                            HostTransform.localScale), "object_transform");
+
+                if (_idHolder) { Debug.Log("[SEND Transfrorm] { id: " + _idHolder.ID + ", name: \"" + HostTransform.gameObject.name + "\" }"); }
+                else { Debug.Log("[SEND Transfrorm] { id: 0, name: \"" + HostTransform.gameObject.name + "\" }"); }
             }
         }
 

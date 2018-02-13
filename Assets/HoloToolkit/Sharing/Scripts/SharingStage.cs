@@ -32,6 +32,12 @@ namespace HoloToolkit.Sharing
         public ClientRole ClientRole = ClientRole.Primary;
 
         /// <summary>
+        /// Address of the sharing server.
+        /// </summary>
+        [Tooltip("Address of the sharing server")]
+        public string ServerAddress = "localhost";
+
+        /// <summary>
         /// Port of the sharing server.
         /// </summary>
         [Tooltip("Port of the sharing server")]
@@ -269,7 +275,7 @@ namespace HoloToolkit.Sharing
             // Only set the server info is we are connecting on awake
             if (connectOnAwake)
             {
-                config.SetServerAddress(SV_Settings.Instance.localIP);
+                config.SetServerAddress(ServerAddress);
                 config.SetServerPort(ServerPort);
             }
 
@@ -325,7 +331,7 @@ namespace HoloToolkit.Sharing
             }
             else
             {
-                Log.Error(string.Format("Cannot connect to server {0}:{1}", SV_Settings.Instance.localIP, ServerPort.ToString()));
+                Log.Error(string.Format("Cannot connect to server {0}:{1}", ServerAddress, ServerPort.ToString()));
             }
         }
 
@@ -367,29 +373,29 @@ namespace HoloToolkit.Sharing
             {
                 //Found a server. Stop pinging the network and connect 
                 isTryingToFindServer = false;
-                SV_Settings.Instance.localIP = obj.GetAddress();
+                ServerAddress = obj.GetAddress();
                 if (ShowDetailedLogs)
                 {
-                    Debug.Log("Server discovered at: " + SV_Settings.Instance.localIP);
+                    Debug.Log("Server discovered at: " + ServerAddress);
                 }
                 Connect();
                 if (ShowDetailedLogs)
                 {
-                    Debug.LogFormat("Connected to: {0}:{1}", SV_Settings.Instance.localIP, ServerPort.ToString());
+                    Debug.LogFormat("Connected to: {0}:{1}", ServerAddress, ServerPort.ToString());
                 }
             }
         }
 
         public void ConnectToServer(string serverAddress, int port)
         {
-            SV_Settings.Instance.localIP = serverAddress;
+            ServerAddress = serverAddress;
             ServerPort = port;
             ConnectToServer();
         }
 
         public void ConnectToServer()
         {
-            Manager.SetServerConnectionInfo(SV_Settings.Instance.localIP, (uint)ServerPort);
+            Manager.SetServerConnectionInfo(ServerAddress, (uint)ServerPort);
         }
 
         private void OnEnable()

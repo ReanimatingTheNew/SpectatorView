@@ -50,7 +50,9 @@ namespace SpectatorView
                 meshObject.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             }
 
-            GameObject surfaceObject = AddSurfaceObject(mesh, "RemoteSpatialMapping", transform);
+            // fix for new holotoolkit
+            GameObject surfaceObject = CreateSurfaceObject(mesh, "RemoteSpatialMapping", transform, 0).Object;
+
             surfaceObject.transform.localPosition = Vector3.zero;
             surfaceObject.transform.localRotation = Quaternion.identity;
 

@@ -40,7 +40,6 @@ namespace Andy.IdGenerator
         /// <returns></returns>
         public GameObject GetObject(int id)
         {
-
             /*
             // if _holdersCache is empty
             if (_holdersCache == null

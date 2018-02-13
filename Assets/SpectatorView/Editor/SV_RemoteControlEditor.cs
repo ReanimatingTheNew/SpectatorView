@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using SpectatorView.Sharing;
+using SpectatorView;
 
 [CustomEditor(typeof(SV_RemoteControl))]
 public class SV_RemoteControlEdotor : Editor
@@ -14,11 +16,6 @@ public class SV_RemoteControlEdotor : Editor
         {
             SV_Sharing.Instance.SendValue(true, "terminate_app", true);
         }
-
-        //if (GUILayout.Button("Test"))
-        //{
-        //    SV_Sharing.Instance.SendValue(true, "test_request", true);
-        //}
     }
 
     #endregion

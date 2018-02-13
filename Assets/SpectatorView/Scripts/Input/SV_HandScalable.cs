@@ -3,6 +3,7 @@
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 using System;
+using SpectatorView.Sharing;
 
 namespace SpectatorView.InputModule
 {

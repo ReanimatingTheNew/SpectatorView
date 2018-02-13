@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectatorView 2017.1", "SpectatorView 2017.1.csproj", "{4B267784-211B-5E16-DE2C-F5AD9E5A45DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectatorView 2017.1.Editor", "SpectatorView 2017.1.Editor.csproj", "{A3C5424E-C271-C2A3-195B-03FACF25BD1C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B267784-211B-5E16-DE2C-F5AD9E5A45DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B267784-211B-5E16-DE2C-F5AD9E5A45DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B267784-211B-5E16-DE2C-F5AD9E5A45DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B267784-211B-5E16-DE2C-F5AD9E5A45DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3C5424E-C271-C2A3-195B-03FACF25BD1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3C5424E-C271-C2A3-195B-03FACF25BD1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3C5424E-C271-C2A3-195B-03FACF25BD1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3C5424E-C271-C2A3-195B-03FACF25BD1C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

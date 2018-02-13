@@ -133,15 +133,6 @@ namespace HoloToolkit.Unity.SpatialMapping
             }
         }
 
-        protected GameObject AddSurfaceObject(Mesh mesh, string objectName, Transform parentObject, int meshID = 0)
-        {
-            var obj = CreateSurfaceObject(mesh, objectName, parentObject, meshID);
-
-            AddSurfaceObject(obj);
-
-            return obj.Object;
-        }
-
         /// <summary>
         /// Update the first surface with a matching ID if one exists in <see cref="SurfaceObjects"/>, otherwise add the surface as new.
         /// </summary>

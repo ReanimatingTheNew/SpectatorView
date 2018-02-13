@@ -1,93 +1,96 @@
 ﻿using SpectatorView.InputModule;
 using UnityEngine;
 
-public class MenuController : MonoBehaviour
+namespace SpectatorView.Examples
 {
-    #region Public Fields
-
-    public GameObject target;
-
-    #endregion
-
-    #region Private Fields
-
-    private SV_HandDraggable handDraggable;
-    private SV_HandRotatable handRotatable;
-    private SV_HandScalable handScalable;
-
-    #endregion
-
-    #region Private Properties
-
-    private SV_HandDraggable SV_HandDraggable
+    public class MenuController : MonoBehaviour
     {
-        get
+        #region Public Fields
+
+        public GameObject target;
+
+        #endregion
+
+        #region Private Fields
+
+        private SV_HandDraggable handDraggable;
+        private SV_HandRotatable handRotatable;
+        private SV_HandScalable handScalable;
+
+        #endregion
+
+        #region Private Properties
+
+        private SV_HandDraggable SV_HandDraggable
         {
-            if (!handDraggable)
+            get
             {
-                handDraggable = target.GetComponent<SV_HandDraggable>();
+                if (!handDraggable)
+                {
+                    handDraggable = target.GetComponent<SV_HandDraggable>();
+                }
+
+                return handDraggable;
             }
-
-            return handDraggable;
         }
-    }
 
-    private SV_HandRotatable SV_HandRotatable
-    {
-        get
+        private SV_HandRotatable SV_HandRotatable
         {
-            if (!handRotatable)
+            get
             {
-                handRotatable = target.GetComponent<SV_HandRotatable>();
+                if (!handRotatable)
+                {
+                    handRotatable = target.GetComponent<SV_HandRotatable>();
+                }
+
+                return handRotatable;
             }
-
-            return handRotatable;
         }
-    }
 
-    private SV_HandScalable SV_HandScalable
-    {
-        get
+        private SV_HandScalable SV_HandScalable
         {
-            if (!handScalable)
+            get
             {
-                handScalable = target.GetComponent<SV_HandScalable>();
+                if (!handScalable)
+                {
+                    handScalable = target.GetComponent<SV_HandScalable>();
+                }
+
+                return handScalable;
             }
-
-            return handScalable;
         }
+
+        #endregion
+
+        #region Public Events
+
+        public void OnMove()
+        {
+            SV_HandDraggable.IsEnabled = true;
+            SV_HandRotatable.IsEnabled = false;
+            SV_HandScalable.IsEnabled = false;
+
+            //Debug.Log("OnMove");
+        }
+
+        public void OnRotate()
+        {
+            SV_HandDraggable.IsEnabled = false;
+            SV_HandRotatable.IsEnabled = true;
+            SV_HandScalable.IsEnabled = false;
+
+            //Debug.Log("OnRotate");
+        }
+
+        public void OnScale()
+        {
+            SV_HandDraggable.IsEnabled = false;
+            SV_HandRotatable.IsEnabled = false;
+            SV_HandScalable.IsEnabled = true;
+
+            //Debug.Log("OnScale");
+        }
+
+        #endregion
     }
-
-    #endregion
-
-    #region Public Events
-
-    public void OnMove()
-    {
-        SV_HandDraggable.IsEnabled = true;
-        SV_HandRotatable.IsEnabled = false;
-        SV_HandScalable.IsEnabled = false;
-
-        Debug.Log("OnMove");
-    }
-
-    public void OnRotate()
-    {
-        SV_HandDraggable.IsEnabled = false;
-        SV_HandRotatable.IsEnabled = true;
-        SV_HandScalable.IsEnabled = false;
-
-        Debug.Log("OnRotate");
-    }
-
-    public void OnScale()
-    {
-        SV_HandDraggable.IsEnabled = false;
-        SV_HandRotatable.IsEnabled = false;
-        SV_HandScalable.IsEnabled = true;
-
-        Debug.Log("OnScale");
-    }
-
-    #endregion
 }

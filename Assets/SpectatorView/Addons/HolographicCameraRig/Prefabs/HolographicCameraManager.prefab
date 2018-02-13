@@ -101,8 +101,6 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
-  m_AllowMSAA: 1
-  m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
@@ -137,8 +135,6 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
-  m_AllowMSAA: 1
-  m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
@@ -154,12 +150,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9186b604205a50e47a9647cd566e4bb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HolographicCameraIP: 192.168.43.35
+  HolographicCameraIP: 
   LocalComputerIP: 
   TextureDepth: 16
   AntiAliasing: 4
   Filter: 1
   DefaultAlpha: 0.9
   DefaultFrameOffset: 0
-  frameProviderInitialized: 0
   requestSpatialMappingData: 0

@@ -186,10 +186,10 @@ namespace SpectatorView
             }
 #endif
 
-            foreach (string ip in localIPs)
-            {
-                Debug.Log("Local IP: " + ip);
-            }
+            //foreach (string ip in localIPs)
+            //{
+            //    Debug.Log("Local IP: " + ip);
+            //}
         }
 
 #if UNITY_EDITOR
@@ -241,7 +241,7 @@ namespace SpectatorView
 
         public void ResetCompositor()
         {
-            Debug.Log("Disposing DLL Resources.");
+            //Debug.Log("Disposing DLL Resources.");
             Reset();
 
             StopFrameProvider();
